@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 
 import retrieveUser from '../logic/retrieveUser'
+import logoutUser from '../logic/logoutUser'
+
+import { JWTExpiredError } from '../utils/errors'
 
 import Button from '../components/Button'
 import Link from '../components/Link'
@@ -23,7 +26,7 @@ function Home(props) {
         console.log('Home useEffect')
 
         try {
-            retrieveUser(sessionStorage.userId, (error, user) => {
+            retrieveUser((error, user) => {
                 if (error) {
                     alert(error.message)
 
@@ -33,12 +36,15 @@ function Home(props) {
                 setName(user.name)
             })
         } catch (error) {
-            alert(error.message)
+            if (error instanceof JWTExpiredError)
+                props.onError(error)
+            else
+                alert(error.message)
         }
     }, [])
 
     function handleLogoutClick() {
-        sessionStorage.userId = null
+        logoutUser()
 
         props.onLogout()
     }
@@ -74,17 +80,17 @@ function Home(props) {
         setView('my-posts')
     }
 
-    return <Container>
-        <header className="header" aria-label="Header">
-            <Link onClick={handleHomeClick}><Logo /></Link>
+    return <Container align="center">
+        <header className="flex justify-between items-center md:min-w-[500px] lg:min-w-[768px]" aria-label="Header">
+            <Link className="hidden lg:block" onClick={handleHomeClick}><Logo /></Link>
 
-            <span aria-label="User name">{name}</span>
-
-            <Button title="New post" aria-label="New post (+)" onClick={handleNewPostClick}>+</Button>
+            <Button className="hidden lg:block" title="New post" aria-label="New post (+)" onClick={handleNewPostClick}>+</Button>
 
             <Link onClick={handleSavedClick}>Saved</Link>
 
             <Link onClick={handleMyPostsClick}>My posts</Link>
+
+            <span aria-label="User name">{name}</span>
 
             <Button onClick={handleLogoutClick}>Logout</Button>
         </header>
@@ -96,6 +102,13 @@ function Home(props) {
         {view === 'saved' ? <SavedPosts /> : null}
 
         {view === 'my-posts' ? <MyPosts /> : null}
+
+        <div className="h-[2rem]"></div>
+
+        <footer className="bg-white fixed bottom-0 w-full flex justify-center items-center h-[2rem] lg:hidden">
+            <Link onClick={handleHomeClick}><Logo /></Link>
+            <Button title="New post" aria-label="New post (+)" onClick={handleNewPostClick}>+</Button>
+        </footer>
     </Container>
 }
 

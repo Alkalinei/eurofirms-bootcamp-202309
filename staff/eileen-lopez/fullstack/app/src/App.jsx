@@ -3,13 +3,14 @@ import React from 'react'
 import Register from './views/Register'
 import Home from './views/Home'
 
+import logoutUser from './logic/logoutUser'
+
+import { JWTExpiredError } from './utils/errors'
+
 function App() {
   console.log('App')
 
-  const viewState = React.useState(sessionStorage.userId? 'home':'login')
-  // const viewState = React.useState('home')
-  const view = viewState[0]
-  const setView = viewState[1]
+  const [view, setView] = React.useState(sessionStorage.token ? 'home' : 'login')
 
   function handleRegisterShow() {
     setView('register')
@@ -23,12 +24,20 @@ function App() {
     setView('home')
   }
 
+  function handleError(error) {
+    if (error instanceof JWTExpiredError) {
+      logoutUser()
+
+      setView('login')
+    }
+  }
+
   return <>
     {view === 'login' ? <Login onSuccess={handleHomeShow} onRegisterClick={handleRegisterShow} /> : null}
 
     {view === 'register' ? <Register onSuccess={handleLoginShow} onLoginClick={handleLoginShow} /> : null}
 
-    {view === 'home' ? <Home onLogout={handleLoginShow} /> : null}
+    {view === 'home' ? <Home onLogout={handleLoginShow} onError={handleError} /> : null}
   </>
 }
 

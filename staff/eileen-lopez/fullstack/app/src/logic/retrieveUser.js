@@ -1,13 +1,14 @@
-import { validateText, validateFunction } from '../utils/validators'
+import { validateJWT, validateFunction } from '../utils/validators'
+import context from './context'
 
-function retrieveUser(userId, callback) {
-    validateText(userId, 'user id')
+function retrieveUser(callback) {
     validateFunction(callback, 'callback')
+    validateJWT(context.jwt)
 
     const req = {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${userId}`,
+            Authorization: `Bearer ${context.storage.token}`,
         },
     }
 

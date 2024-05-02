@@ -2,7 +2,7 @@ import { validateEmail, validatePassword, validateFunction } from '../utils/vali
 import context from './context'
 import JWT from '../utils/jwt'
 
-function authenticateUser(email, password, callback) {
+function loginUser(email, password, callback) {
     validateEmail(email)
     validatePassword(password)
     validateFunction(callback, 'callback')
@@ -37,4 +37,4 @@ function authenticateUser(email, password, callback) {
         .catch(error => console.error(error))
 }
 
-export default authenticateUser
+export default loginUser

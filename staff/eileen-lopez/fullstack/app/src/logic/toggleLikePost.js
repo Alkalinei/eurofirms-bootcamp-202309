@@ -1,14 +1,14 @@
 import { validateText, validateFunction } from '../utils/validators'
+import context from './context'
 
-function toggleLikePost(userId, postId, callback) {
-    validateText(userId, 'user id')
+function toggleLikePost(postId, callback) {
     validateText(postId, 'post id')
     validateFunction(callback, 'callback')
 
     const req = {
         method: 'PATCH',
         headers: {
-            Authorization: `Bearer ${userId}`
+            Authorization: `Bearer ${context.storage.token}`
         }
     }
 
